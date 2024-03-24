@@ -1,3 +1,6 @@
+// [백준] 6054 - 카잉 달력 
+// Silver I
+
 #include <stdio.h>
 
 int main() {
