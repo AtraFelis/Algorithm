@@ -1,3 +1,6 @@
+//[백준] 5430 - AC
+// Gold V
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
