@@ -1,3 +1,8 @@
+/**
+ * [백준] 1051 - 숫자 정사각형
+ * Silver III
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
