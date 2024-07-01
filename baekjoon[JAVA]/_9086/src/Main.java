@@ -13,6 +13,6 @@ public class Main {
             sb.append(str.charAt(0)).append(str.charAt(str.length() - 1)).append('\n');
         }
 
-        System.out.println(sb);
+        System.out.println(sb); 
     }
 }
