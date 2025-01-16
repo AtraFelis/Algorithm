@@ -7,20 +7,17 @@ public class Main {
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-        StringBuilder sb = new StringBuilder();
+        StringBuilder answer = new StringBuilder();
 
         int n = Integer.parseInt(st.nextToken());
         int m = Integer.parseInt(st.nextToken());
 
         for (int i = 0; i < n; i++) {
-            String str = br.readLine();
-            String[] split = str.split("");
-
-            for (int j = m-1; j >= 0 ; j--) {
-                sb.append(split[j]);
-            }
-            sb.append('\n');
+            StringBuilder sb = new StringBuilder(br.readLine());
+            sb.reverse();
+            answer.append(sb.toString()).append("\n");
         }
-        System.out.println(sb);
+
+        System.out.println(answer);
     }
 }
