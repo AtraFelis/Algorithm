@@ -4,218 +4,134 @@ import java.io.InputStreamReader;
 import java.util.*;
 
 public class Main {
-    static Map<String, Integer> yut = new HashMap<>();
-    static int[][] move = new int[29][5];
-    static int[] map = new int[29];
+    static class Node {
+        int next;
+        int shortCut;
+        boolean goal;
+        int piece;
+
+        public Node(int next, int shortCut, boolean goal) {
+            this.next = next;
+            this.shortCut = shortCut;
+            this.goal = goal;
+        }
+    }
+
+    static class Piece {
+        int player;
+        int position;
+        boolean goal = false;
+
+        public Piece(int player, int position) {
+            this.player = player;
+            this.position = position;
+        }
+    }
+
+    static HashMap<String, Integer> yutCnt = new HashMap<>();
     static int U, N, A, B;
-    static int goalA = 0, goalB = 0;
-    static int remainA, remainB;
-    static String[] yutStates;
-    static ArrayList<Integer> aPos, bPos;
-    static boolean result = false;
+    static int[] yutValues;
+    static int[] aPosition, bPosition;
+    static Piece[] aPieces, bPieces;
+    static Node[] board = new Node[31];
+    // 마지막 노드 인덱스는 29 -> 여기서는 말이 잡힐 수 있음
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer stk;
         StringBuilder sb = new StringBuilder();
 
-        yut.put("Do", 1);
-        yut.put("Gae", 2);
-        yut.put("Gul", 3);
-        yut.put("Yut", 4);
-        yut.put("Mo", 5);
+        yutCnt.put("Do", 1);
+        yutCnt.put("Gae", 2);
+        yutCnt.put("Gul", 3);
+        yutCnt.put("Yut", 4);
+        yutCnt.put("Mo", 5);
 
-        for (int i = 0; i < 29; i++) {
-            for (int j = 0; j < 5; j++) {
-                move[i][j] = i+j+1;
-            }
-            map[i] = 0;
-        }
-
-        move[5] = new int[]{20, 21, 22, 23, 24};
-        move[10] = new int[]{25, 26, 22, 27, 28};
-        move[15] = new int[]{16, 17, 18, 19, 0};
-        move[16] = new int[]{17, 18, 19, 0, 29};
-        move[17] = new int[]{18, 19, 0, 29, 29};
-        move[18] = new int[]{19, 0, 29, 29, 29};
-        move[19] = new int[]{0, 29, 29, 29, 29};
-        move[20] = new int[]{21, 22, 24, 25, 15};
-        move[21] = new int[]{22, 23, 24, 15, 16};
-        move[22] = new int[]{27, 28, 0, 29, 29};
-        move[23] = new int[]{24, 15, 16, 17, 18};
-        move[24] = new int[]{15, 16, 17, 18, 19};
-        move[25] = new int[]{26, 22, 27, 28, 0};
-        move[26] = new int[]{22, 27, 28, 0, 29};
-        move[27] = new int[]{28, 0, 29, 29, 29};
-        move[28] = new int[]{0, 29, 29, 29, 29};
-        move[0] = new int[]{29, 29, 29, 29, 29};
-
+        initGame();
 
         int T = Integer.parseInt(br.readLine());
-
         for (int i = 0; i < T; i++) {
-            stk = new StringTokenizer(br.readLine());
-            remainA = remainB = U = Integer.parseInt(stk.nextToken());
-            N = Integer.parseInt(stk.nextToken());
-            A = Integer.parseInt(stk.nextToken());
-            B = Integer.parseInt(stk.nextToken());
-
-            yutStates = new String[N];
-            stk = new StringTokenizer(br.readLine());
-            for (int j = 0; j < N; j++) {
-                yutStates[j] = stk.nextToken();
-            }
-
-            aPos = new ArrayList<>();
-            bPos = new ArrayList<>();
-
-            stk = new StringTokenizer(br.readLine());
-            while (stk.hasMoreTokens()) {
-                aPos.add(Integer.parseInt(stk.nextToken()));
-            }
-            stk = new StringTokenizer(br.readLine());
-            while (stk.hasMoreTokens()) {
-                bPos.add(Integer.parseInt(stk.nextToken()));
-            }
-
-            result = false;
-            solution(0, 1);
-            sb.append("Case #").append(i + 1).append(": ").append(result ? "YES" : "NO").append("\n");
+            initGame();
+            backTracking(0);
+            sb.append("Case #").append(i+1).append(": ").append(canMade ? "YES\n" : "NO\n");
         }
 
         System.out.println(sb);
     }
 
-    private static void solution(int cnt, int turn) {
-        if(result) return;
-
-        // 윷을 전부 소모하지 않았는데 게임이 종료되었다면, return
-        if (cnt != N && (goalA == U || goalB == U)) {
+    private static boolean canMade = false;
+    private static void backTracking(int depth) {
+        if(canMade)
             return;
-        }
 
-        if (cnt == N) {
-            int currentA = 0, currentB = 0; // 현재 말판 위에 올라간 말의 개수
-            for (int i = 0; i < 29; i++) {
-                if(map[i] > 0)
-                    currentA += map[i];
-                else if(map[i] < 0)
-                    currentB += map[i] * -1;
-            }
-
-            if(currentA != A || currentB != B) {
-                return;
-            }
-
-            for (Integer a : aPos) {
-                if (map[a] <= 0)
-                    return;
-            }
-            for (Integer b : bPos) {
-                if (map[b] >= 0)
-                    return;
-            }
-
-            result = true;
-        } else {
+        if (depth == N) {
             /*
-            1. 기존에 있던 말을 움직임.
-            2. 새로운 말이 나감
+            1. 판 위에 올라간 말의 개수가 동일한지.
+            2. 말의 위치가 동일한지.
              */
+        } else {
 
-            int moveDis = yut.get(yutStates[cnt]);
-            int oneMore = moveDis >= 4 ? 1 : -1;
-
-            // 1. 기존 말을 움직임
-            int nextPos;
-            for (int i = 0; i < map.length; i++) {
-                if (turn == 1 && map[i] > 0) {
-                    nextPos = move[i][moveDis-1];
-                    if (nextPos < 29) {
-                        int tmp = map[nextPos];
-
-                        if (map[nextPos] < 0) { // B의 말이 이미 존재할 경우
-                            remainB += map[nextPos];
-                            map[nextPos] = map[i];
-                            map[i] = 0;
-                            solution(cnt + 1, turn);
-                            map[i] = map[nextPos];
-                            map[nextPos] = tmp;
-                            remainB -= map[nextPos];
-                        } else if (map[nextPos] >= 0) {
-                            map[nextPos] += map[i];
-                            map[i] = 0;
-                            solution(cnt + 1, turn * oneMore);
-                            map[i] = map[nextPos] - tmp;
-                            map[nextPos] = tmp;
-                        }
-                    } else { // 골인
-                        int tmp = map[i];
-                        goalA++;
-                        map[i] = 0;
-                        solution(cnt + 1, turn * oneMore);
-                        map[i] = tmp;
-                        goalA--;
-                    }
-                } else if (turn == -1 && map[i] < 0) {
-                    nextPos = move[i][moveDis-1];
-                    if (nextPos < 29) {
-                        int tmp = map[nextPos];
-                        // A의 말이 이미 존재할 경우
-                        if (map[nextPos] > 0) {
-                            remainA += map[nextPos];
-                            map[nextPos] = map[i];
-                            map[i] = 0;
-                            solution(cnt + 1, turn);
-                            map[i] = map[nextPos];
-                            map[nextPos] = tmp;
-                            remainA -= map[nextPos];
-                        } else if (map[nextPos] <= 0) {
-                            map[nextPos] += map[i];
-                            map[i] = 0;
-                            solution(cnt + 1, turn * oneMore);
-                            map[i] = map[nextPos] - tmp;
-                            map[nextPos] = tmp;
-                        }
-                    } else { // 골인
-                        int tmp = map[i];
-                        map[i] = 0;
-                        goalB++;
-                        solution(cnt + 1, turn * oneMore);
-                        goalB--;
-                        map[i] = tmp;
-                    }
-                }
-            }
-
-            // 2. 새로운 말을 내보냄
-            if (turn == 1 && remainA != 0) {
-                int tmp = map[moveDis];
-                remainA--;
-                // B의 말이 이미 존재할 경우
-                if (map[moveDis] < 0) {
-                    map[moveDis] = 1;
-                    solution(cnt + 1, turn);
-                } else {
-                    map[moveDis]++;
-                    solution(cnt + 1, turn * oneMore);
-                }
-                remainA++;
-                map[moveDis] = tmp;
-            } else if (turn == -1 && remainB != 0) {
-                remainB--;
-                int tmp = map[moveDis];
-                // A의 말이 이미 존재할 경우
-                if (map[moveDis] > 0) {
-                    map[moveDis] = -1;
-                    solution(cnt + 1, turn);
-                } else {
-                    map[moveDis]--;
-                    solution(cnt + 1, turn * oneMore);
-                }
-                remainB++;
-                map[moveDis] = tmp;
-            }
         }
+    }
+
+    private static void initGame() throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer stk;
+
+        initBoard();
+
+        stk = new StringTokenizer(br.readLine());
+        U = Integer.parseInt(stk.nextToken());
+        N = Integer.parseInt(stk.nextToken());
+        A = Integer.parseInt(stk.nextToken());
+        B = Integer.parseInt(stk.nextToken());
+
+        aPieces = bPieces = new Piece[U];
+
+        for (int i = 0; i < U; i++) {
+            aPieces[i] = new Piece(1, 0);
+            bPieces[i] = new Piece(-1, 0);
+        }
+
+        yutValues = new int[N];
+        aPosition = new int[A];
+        bPosition = new int[B];
+
+        stk = new StringTokenizer(br.readLine());
+        for (int i = 0; i < N; i++) {
+            yutValues[i] = yutCnt.get(stk.nextToken());
+        }
+
+        stk = new StringTokenizer(br.readLine());
+        for (int i = 0; i < A; i++) {
+            aPosition[i] = Integer.parseInt(stk.nextToken());
+        }
+        stk = new StringTokenizer(br.readLine());
+        for (int i = 0; i < B; i++) {
+            bPosition[i] = Integer.parseInt(stk.nextToken());
+        }
+    }
+
+    private static void initBoard() {
+        for (int i = 0; i < 19; i++) {
+            board[i] = new Node(i+1, -1, false);
+        }
+
+        board[5].shortCut = 20;
+        board[10].shortCut = 25;
+
+        board[20] = new Node(21, -1, false);
+        board[21] = new Node(22, -1, false);
+        board[25] = new Node(26, -1, false);
+        board[26] = new Node(22, -1, false);
+        board[23] = new Node(24, -1, false);
+        board[24] = new Node(15, -1, false);
+        board[27] = new Node(28, -1, false);
+        board[28] = new Node(29, -1, false);
+
+        // 21과 26에서 지나갈 때의 방향이 다르므로 예외처리.
+        board[22] = new Node(-1, 27, false);
+        // 실제로는 0번 노드와 같은 위치. 편하게 처리하기 위해서 29로 따로 배정
+        board[29] = new Node(30, -1, false);
+        board[30] = new Node(30, -1, true);
     }
 }
