@@ -14,32 +14,43 @@ public class Main {
         int M = Integer.parseInt(stk.nextToken());
 
         int[] map = new int[N];
+
         stk = new StringTokenizer(br.readLine());
         for (int i = 0; i < N; i++) {
             map[i] = Integer.parseInt(stk.nextToken());
         }
 
-        int check = 9 * M / 10;
-        check = 9 * M % 10 == 0 ? check : check + 1;
+        int check = (9 * M + 9) / 10;
 
         boolean resultFlag = false;
         Map<Integer, Integer> window = new HashMap<>();
-        for (int j = 0; j < M; j++) {
-            window.put(map[j], 1 + window.getOrDefault(map[j], 0));
 
-            if(window.get(map[j]) >= check)
-                resultFlag = true;
-        }
+/*      // HashMap 사용
+        for (int i = 0; i < N; i++) {
+            window.put(map[i], 1 + window.getOrDefault(map[i], 0));
 
-        for (int i = 1; i <= N - M; i++) {
-            window.put(map[i-1], window.get(map[i-1]) - 1);
-            window.put(map[i + M - 1], 1 + window.getOrDefault(map[i + M - 1], 0));
+            if(i >= M) window.put(map[i - M], window.get(map[i - M]) - 1);
 
-            if(window.get(map[i + M - 1]) >= check) {
+            if(window.get(map[i]) >= check) {
                 resultFlag = true;
                 break;
             }
         }
+*/
+
+        int[] numCnt = new int[1000001];
+
+        for (int i = 0; i < N; i++) {
+            numCnt[map[i]]++;
+
+            if(i >= M) numCnt[map[i - M]]--;
+
+            if(numCnt[map[i]] == check) {
+                resultFlag = true;
+                break;
+            }
+        }
+
 
         System.out.println(resultFlag ? "YES" : "NO");
     }
