@@ -38,7 +38,6 @@ public class Main {
                 int connectedNode = Integer.parseInt(stk.nextToken());
                 if(connectedNode == -1) break;
                 int dist = Integer.parseInt(stk.nextToken());
-
                 tree.get(node).add(new Node(connectedNode, dist));
             }
         }
