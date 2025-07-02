@@ -2,14 +2,14 @@ import java.util.*;
 import java.io.*;
 
 public class Main {
-    
     private static List<List<Node>> tree;
     private static boolean[] visited;
+    private static Node maxNode = new Node(0, 0);
 
     // 노드와 거리 정보를 담는 클래스
     static class Node {
         int vertex;
-        int dist;
+        int dist; // 부모 노드와의 거리
         
         Node(int vertex, int dist) {
             this.vertex = vertex;
@@ -38,32 +38,32 @@ public class Main {
                 int connectedNode = Integer.parseInt(stk.nextToken());
                 if(connectedNode == -1) break;
                 int dist = Integer.parseInt(stk.nextToken());
-                
+
                 tree.get(node).add(new Node(connectedNode, dist));
             }
         }
+        
+        visited[1] = true;
+        dfs(1, 0); // 임의의 노드에서 가장 거리가 먼 노드 찾기 (이게 가장 긴 지름은 아님)
 
-        // 1번 노드를 루트로 두고 탐색
-        checkDiameter(1, 1, 0);
+        Arrays.fill(visited, false);
 
-        int answer = 0;
-        for (int i = 1; i <= v; i++) {
-            for (int j = i; j <= v; j++) {
-                answer = Math.max(answer, tree[i][j]);
+        visited[maxNode.vertex] = true;
+        dfs(maxNode.vertex, 0); // 임의의 노드로부터 가장 먼 거리의 노드를 루트로 dfs -> 여기서 구해진 지름이 가장 긴 지름
+
+        System.out.println(maxNode.dist);
+    }
+
+    private static void dfs(int vertex, int dist) {
+        for (Node child : tree.get(vertex)) {
+            if(!visited[child.vertex]) {
+                visited[child.vertex] = true;
+                dfs(child.vertex, dist + child.dist);
             }
         }
 
-        System.out.println(answer);
-    }
-
-    // dfs로 노드별로 탐색
-    private static void checkDiameter(int root, int prevNode, int prevDist) {
-        for (Node child : tree.get(prevNode)) {
-            if(!visited[child.vertex]) {
-                visited[child.vertex] = true;
-                checkDiameter(root, child.vertex, prevDist + child.dist);
-            }
-            
+        if(maxNode.dist < dist) {
+            maxNode = new Node(vertex, dist);
         }
     }
 }
