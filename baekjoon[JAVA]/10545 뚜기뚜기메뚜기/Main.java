@@ -2,33 +2,33 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-    private static final Map<Character, String> KEY_MAP = Map.ofEntries(
-        Map.entry('a', "21"),
-        Map.entry('b', "22"),
-        Map.entry('c', "23"),
-        Map.entry('d', "31"),
-        Map.entry('e', "32"),
-        Map.entry('f', "33"),
-        Map.entry('g', "41"),
-        Map.entry('h', "42"),
-        Map.entry('i', "43"),
-        Map.entry('j', "51"),
-        Map.entry('k', "52"),
-        Map.entry('l', "53"),
-        Map.entry('m', "61"),
-        Map.entry('n', "62"),
-        Map.entry('o', "63"),
-        Map.entry('p', "71"),
-        Map.entry('q', "72"),
-        Map.entry('r', "73"),
-        Map.entry('s', "74"),
-        Map.entry('t', "81"),
-        Map.entry('u', "82"),
-        Map.entry('v', "83"),
-        Map.entry('w', "91"),
-        Map.entry('x', "92"),
-        Map.entry('y', "93"),
-        Map.entry('z', "94")
+    private static final Map<Character, int[]> KEY_MAP = Map.ofEntries(
+        Map.entry('a', new int[]{2, 1}),
+        Map.entry('b', new int[]{2, 2}),
+        Map.entry('c', new int[]{2, 3}),
+        Map.entry('d', new int[]{3, 1}),
+        Map.entry('e', new int[]{3, 2}),
+        Map.entry('f', new int[]{3, 3}),
+        Map.entry('g', new int[]{4, 1}),
+        Map.entry('h', new int[]{4, 2}),
+        Map.entry('i', new int[]{4, 3}),
+        Map.entry('j', new int[]{5, 1}),
+        Map.entry('k', new int[]{5, 2}),
+        Map.entry('l', new int[]{5, 3}),
+        Map.entry('m', new int[]{6, 1}),
+        Map.entry('n', new int[]{6, 2}),
+        Map.entry('o', new int[]{6, 3}),
+        Map.entry('p', new int[]{7, 1}),
+        Map.entry('q', new int[]{7, 2}),
+        Map.entry('r', new int[]{7, 3}),
+        Map.entry('s', new int[]{7, 4}),
+        Map.entry('t', new int[]{8, 1}),
+        Map.entry('u', new int[]{8, 2}),
+        Map.entry('v', new int[]{8, 3}),
+        Map.entry('w', new int[]{9, 1}),
+        Map.entry('x', new int[]{9, 2}),
+        Map.entry('y', new int[]{9, 3}),
+        Map.entry('z', new int[]{9, 4})
     );
 
     public static void main(String[] args) throws IOException{
@@ -45,12 +45,10 @@ public class Main {
         
         int bindingNum = 0;
         int prevNum = -1;
-        for (int i = 0; i < word.length(); i++) {
-            char c = word.charAt(i);
-
-            String key = KEY_MAP.get(c);
-            bindingNum = mixedKeyMap.get(Integer.parseInt(key.substring(0, 1)));
-            int iter = Integer.parseInt(key.substring(1));
+        for (char c : word.toCharArray()) {
+            int[] key = KEY_MAP.get(c);
+            bindingNum = mixedKeyMap.get(key[0]);
+            int iter = key[1];
 
             if(prevNum == bindingNum) answer.append("#");
             prevNum = bindingNum;
