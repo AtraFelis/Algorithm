@@ -3,8 +3,6 @@ import java.util.*;
 
 public class Main {
     private static final int INF = Integer.MAX_VALUE;
-
-    private static boolean[] visited;
     private static int n, m, x;
 
     private static class Edge {
@@ -38,8 +36,6 @@ public class Main {
         List<List<Edge>> graph = new ArrayList<>();
         List<List<Edge>> reverseGraph = new ArrayList<>();
 
-        visited = new boolean[n+1];
-
         for (int i = 0; i <= n; i++) {
             graph.add(new ArrayList<>());
             reverseGraph.add(new ArrayList<>());
@@ -60,7 +56,6 @@ public class Main {
         int[] forward = dijkstra(x, reverseGraph);
 
         // 돌아오는길(정방향 그래프)
-        Arrays.fill(visited, false);
         int[] backward = dijkstra(x, graph);
 
         int answer = 0;
@@ -77,6 +72,8 @@ public class Main {
         pq.add(new Node(startVertex, 0));
 
         int[] distances = new int[n+1];
+        boolean[] visited = new boolean[n+1];
+
         Arrays.fill(distances, INF);
         distances[startVertex] = 0;
 
@@ -90,10 +87,7 @@ public class Main {
             
             for (Edge edge : graph.get(curNode.vertex)) {
                 if(!visited[edge.dest]) {
-                    distances[edge.dest] =
-                        distances[edge.dest] < distances[curNode.vertex] + edge.weight ?
-                        distances[edge.dest] : distances[curNode.vertex] + edge.weight;
-                    
+                    distances[edge.dest] = Math.min(distances[edge.dest], distances[curNode.vertex] + edge.weight);
                     pq.offer(new Node(edge.dest, distances[edge.dest]));
                 }
             }
