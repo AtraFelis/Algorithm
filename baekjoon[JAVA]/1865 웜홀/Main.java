@@ -35,7 +35,7 @@ public class Main {
     private static void bellmanFord() {
         int n = distances.length;
 
-        for (int i = 1; i < n-1; i++) {
+        for (int i = 0; i < n-1; i++) {
             for (Edge edge : graph) {
                 if(distances[edge.source] != Integer.MAX_VALUE) {
                     distances[edge.dest] = Math.min(distances[edge.dest], distances[edge.source] + edge.weight);
@@ -47,10 +47,11 @@ public class Main {
         boolean hasNegativeCycle = false;
         for (Edge edge : graph) {
             if(distances[edge.source] != Integer.MAX_VALUE) {
-                if(distances[edge.dest] > distances[edge.source]) {
+                if(distances[edge.dest] > distances[edge.source] + edge.weight) {
                     hasNegativeCycle = true;
                     break;
                 }
+            }
         }
 
         // 음의 사이클이 하나라도 존재한다면
