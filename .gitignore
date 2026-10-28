@@ -1,0 +1,6 @@
+codetree/
+.claude/
+.vscode/
+SW-Expert-Academy/.idea
+SW-Expert-Academy/SW-Expert-Academy.iml
+generate-java-sourcepaths.ps1
