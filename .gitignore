@@ -1,6 +1,17 @@
 codetree/
 .claude/
-.vscode/
-SW-Expert-Academy/.idea
-SW-Expert-Academy/SW-Expert-Academy.iml
 generate-java-sourcepaths.ps1
+
+# Java 컴파일 결과물
+*.class
+
+# 빌드 디렉터리
+build/
+target/
+out/
+bin/
+
+# IDE 설정 및 임시 파일
+.vscode/
+.idea/
+*.iml
